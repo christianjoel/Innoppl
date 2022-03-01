@@ -1,61 +1,73 @@
-package com.innoppl.roomdatabaseretrofit.Database;
+package com.innoppl.roomdatabaseretrofit.Database
 
-import android.content.Context;
-import android.os.AsyncTask;
+import com.innoppl.roomdatabaseretrofit.Modal.Actor
+import com.google.gson.annotations.SerializedName
+import com.innoppl.roomdatabaseretrofit.Adapter.ActorAdapter.ActorViewHolder
+import android.view.ViewGroup
+import android.view.LayoutInflater
+import com.innoppl.roomdatabaseretrofit.R
+import android.widget.TextView
+import retrofit2.http.GET
+import retrofit2.converter.gson.GsonConverterFactory
+import com.innoppl.roomdatabaseretrofit.Dao.ActorDao
+import com.innoppl.roomdatabaseretrofit.Database.ActorDatabase
+import android.os.AsyncTask
+import kotlin.jvm.Volatile
+import com.innoppl.roomdatabaseretrofit.Database.ActorDatabase.PopulateAsynTask
+import android.app.Application
+import android.content.Context
+import com.innoppl.roomdatabaseretrofit.Repository.ActorRespository
+import com.innoppl.roomdatabaseretrofit.Repository.ActorRespository.InsertAsynTask
+import com.innoppl.roomdatabaseretrofit.ViewModal.ActorViewModal
+import com.innoppl.roomdatabaseretrofit.Adapter.ActorAdapter
+import android.os.Bundle
+import android.widget.Toast
+import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteDatabase
 
-import androidx.annotation.NonNull;
-import androidx.room.Database;
-import androidx.room.Room;
-import androidx.room.RoomDatabase;
-import androidx.sqlite.db.SupportSQLiteDatabase;
-
-import com.innoppl.roomdatabaseretrofit.Dao.ActorDao;
-import com.innoppl.roomdatabaseretrofit.Modal.Actor;
-
-@Database(entities = {Actor.class}, version = 1)
-public abstract class ActorDatabase extends RoomDatabase {
-    private static final String DATABASE_NAME="ActorDatabase";
-
-    public abstract ActorDao actorDao();
-
-    private static volatile ActorDatabase INSTANCE;
-
-    public static ActorDatabase getInstance(Context context){
-        if(INSTANCE == null)
-        {
-            synchronized (ActorDatabase.class){
-                if(INSTANCE == null)
-                {
-                    INSTANCE= Room.databaseBuilder(context, ActorDatabase.class,
-                            DATABASE_NAME)
-                            .addCallback(callback)
-                            .fallbackToDestructiveMigration()
-                            .build();
-                }
-            }
+@Database(entities = [Actor::class], version = 1)
+abstract class ActorDatabase : RoomDatabase() {
+    abstract fun actorDao(): ActorDao
+    internal class PopulateAsynTask(actorDatabase: ActorDatabase?) :
+        AsyncTask<Void?, Void?, Void?>() {
+        private val actorDao: ActorDao
+        protected override fun doInBackground(vararg p0: Void?): Void? {
+            actorDao.deleteAll()
+            return null
         }
-        return INSTANCE;
+
+        init {
+            actorDao = actorDatabase!!.actorDao()
+        }
     }
 
-    static Callback callback=new Callback() {
-        @Override
-        public void onCreate(@NonNull SupportSQLiteDatabase db) {
-            super.onCreate(db);
-            new PopulateAsynTask(INSTANCE);
-        }
-    };
-    static class PopulateAsynTask extends AsyncTask<Void,Void,Void>
-    {
-        private ActorDao actorDao;
-        PopulateAsynTask(ActorDatabase actorDatabase)
-        {
-            actorDao=actorDatabase.actorDao();
+    companion object {
+        private const val DATABASE_NAME = "ActorDatabase"
+
+        @Volatile
+        private var INSTANCE: ActorDatabase? = null
+        fun getInstance(context: Context?): ActorDatabase? {
+            if (INSTANCE == null) {
+                synchronized(ActorDatabase::class.java) {
+                    if (INSTANCE == null) {
+                        INSTANCE = Room.databaseBuilder(
+                            context!!, ActorDatabase::class.java,
+                            DATABASE_NAME
+                        )
+                            .addCallback(callback)
+                            .fallbackToDestructiveMigration()
+                            .build()
+                    }
+                }
+            }
+            return INSTANCE
         }
 
-        @Override
-        protected Void doInBackground(Void... voids) {
-            actorDao.deleteAll();
-            return null;
+        var callback: Callback = object : Callback() {
+            override fun onCreate(db: SupportSQLiteDatabase) {
+                super.onCreate(db)
+                PopulateAsynTask(INSTANCE)
+            }
         }
     }
 }

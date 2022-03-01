@@ -1,95 +1,53 @@
-package com.innoppl.roomdatabaseretrofit.Modal;
+package com.innoppl.roomdatabaseretrofit.Modal
 
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.Index;
-import androidx.room.PrimaryKey;
+import com.innoppl.roomdatabaseretrofit.Modal.Actor
+import com.google.gson.annotations.SerializedName
+import com.innoppl.roomdatabaseretrofit.Adapter.ActorAdapter.ActorViewHolder
+import android.view.ViewGroup
+import android.view.LayoutInflater
+import com.innoppl.roomdatabaseretrofit.R
+import android.widget.TextView
+import retrofit2.http.GET
+import retrofit2.converter.gson.GsonConverterFactory
+import com.innoppl.roomdatabaseretrofit.Dao.ActorDao
+import com.innoppl.roomdatabaseretrofit.Database.ActorDatabase
+import android.os.AsyncTask
+import kotlin.jvm.Volatile
+import com.innoppl.roomdatabaseretrofit.Database.ActorDatabase.PopulateAsynTask
+import android.app.Application
+import com.innoppl.roomdatabaseretrofit.Repository.ActorRespository
+import com.innoppl.roomdatabaseretrofit.Repository.ActorRespository.InsertAsynTask
+import com.innoppl.roomdatabaseretrofit.ViewModal.ActorViewModal
+import com.innoppl.roomdatabaseretrofit.Adapter.ActorAdapter
+import android.os.Bundle
+import android.widget.Toast
+import androidx.room.*
 
-import com.google.gson.annotations.SerializedName;
-
-@Entity(tableName = "actor", indices = @Index(value = {"id"},unique = true))
-public class Actor {
+@Entity(tableName = "actor", indices = [Index(value = ["id"], unique = true)])
+class Actor(
+    @field:ColumnInfo(name = "id") @field:SerializedName("id") var id: Int,
+    @field:ColumnInfo(
+        name = "title"
+    ) @field:SerializedName(
+        "title"
+    ) var title: String,
+    @field:ColumnInfo(name = "thumbnailUrl") @field:SerializedName("thumbnailUrl") var image: String,
+    @field:ColumnInfo(
+        name = "age"
+    ) @field:SerializedName(
+        "age"
+    ) var age: Int
+) {
     @PrimaryKey(autoGenerate = true)
-    private int albumId;
+    var albumId = 0
 
-    @SerializedName("id")
-    @ColumnInfo(name = "id")
-    private int id;
-
-    @SerializedName("title")
-    @ColumnInfo(name = "title")
-    private String title;
-
-    @SerializedName("thumbnailUrl")
-    @ColumnInfo(name = "thumbnailUrl")
-    private String image;
-
-    @SerializedName("age")
-    @ColumnInfo(name = "age")
-    private int age;
-
-
-    public Actor(int id, String title, String image, int age) {
-        this.id = id;
-        this.title = title;
-        this.image = image;
-        this.age = age;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-
-    public int getAlbumId() {
-        return albumId;
-    }
-
-    public void setAlbumId(int albumId) {
-        this.albumId = albumId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-
-    @Override
-    public String toString() {
+    override fun toString(): String {
         return "Actor{" +
                 "albumId=" + albumId +
                 ", id=" + id +
                 ", name='" + title + '\'' +
                 ", image='" + image + '\'' +
                 ", age=" + age +
-                '}';
+                '}'
     }
-
-
-
 }

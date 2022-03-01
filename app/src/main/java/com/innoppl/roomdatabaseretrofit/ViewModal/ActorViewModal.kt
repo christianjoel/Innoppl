@@ -1,35 +1,39 @@
-package com.innoppl.roomdatabaseretrofit.ViewModal;
+package com.innoppl.roomdatabaseretrofit.ViewModal
 
-import android.app.Application;
+import androidx.room.Dao
+import androidx.room.OnConflictStrategy
+import com.innoppl.roomdatabaseretrofit.Modal.Actor
+import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
+import androidx.room.ColumnInfo
+import com.innoppl.roomdatabaseretrofit.Adapter.ActorAdapter.ActorViewHolder
+import android.view.ViewGroup
+import android.view.LayoutInflater
+import com.innoppl.roomdatabaseretrofit.R
+import android.widget.TextView
+import retrofit2.http.GET
+import retrofit2.converter.gson.GsonConverterFactory
+import androidx.room.Database
+import com.innoppl.roomdatabaseretrofit.Dao.ActorDao
+import com.innoppl.roomdatabaseretrofit.Database.ActorDatabase
+import android.os.AsyncTask
+import kotlin.jvm.Volatile
+import com.innoppl.roomdatabaseretrofit.Database.ActorDatabase.PopulateAsynTask
+import android.app.Application
+import com.innoppl.roomdatabaseretrofit.Repository.ActorRespository
+import com.innoppl.roomdatabaseretrofit.Repository.ActorRespository.InsertAsynTask
+import com.innoppl.roomdatabaseretrofit.ViewModal.ActorViewModal
+import com.innoppl.roomdatabaseretrofit.Adapter.ActorAdapter
+import android.os.Bundle
+import android.widget.Toast
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
-
-import com.innoppl.roomdatabaseretrofit.Modal.Actor;
-import com.innoppl.roomdatabaseretrofit.Repository.ActorRespository;
-
-import java.util.List;
-
-public class ActorViewModal extends AndroidViewModel {
-
-    private ActorRespository actorRespository;
-    private LiveData<List<Actor>> getAllActors;
-
-    public ActorViewModal(@NonNull Application application) {
-        super(application);
-        actorRespository=new ActorRespository(application);
-        getAllActors=actorRespository.getAllActors();
-    }
-
-    public void insert(List<Actor> list)
-    {
-        actorRespository.insert(list);
-    }
-
-    public LiveData<List<Actor>> getAllActor()
-    {
-        return getAllActors;
+class ActorViewModal(application: Application) : AndroidViewModel(application) {
+    private val actorRespository: ActorRespository = ActorRespository(application)
+    val allActor: LiveData<List<Actor?>?>? = actorRespository.allActors
+    fun insert(list: List<Actor?>?) {
+        actorRespository.insert(list)
     }
 
 }
